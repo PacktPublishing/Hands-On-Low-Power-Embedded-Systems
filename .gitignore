@@ -1,0 +1,29 @@
+# No binaries and map files allowed in commits
+build/
+build_*_*/
+*.bin
+*.elf
+*.map
+
+# Discard SDK config from commits (automatically generated in building process)
+sdkconfig
+sdkconfig.old
+
+# Discard managed_components (these should be automatically downloaded when building) from commits
+managed_components/
+
+# Discard virtual environments and python scripts from commits
+.espressif/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Discard environment dev & IDE toolsfolders from commits
+.vscode/
+.clangd/
+
+# Discard logs and reports from commits
+pytest_embedded_log/
+app_info_*.txt
+size_info_*.txt
+build_summary_*.xml
