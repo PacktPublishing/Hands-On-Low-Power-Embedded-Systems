@@ -22,8 +22,8 @@
 #define SCL_PIN     19
 
 /* GPIOs used for communication with ultrasonic (HC-SR04) sensor */
-#define TRIG_PIN    25
-#define ECHO_PIN    33
+#define TRIG_PIN    5
+#define ECHO_PIN    21
 
 /* Thresholds for hazards */
 /* Temperature (Fahrenheit) */
