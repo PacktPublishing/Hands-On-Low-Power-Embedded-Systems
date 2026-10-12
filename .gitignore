@@ -1,6 +1,7 @@
 # No binaries and map files allowed in commits
 build/
 build_*_*/
+build_prod/
 *.bin
 *.elf
 *.map
@@ -8,6 +9,7 @@ build_*_*/
 # Discard SDK config from commits (automatically generated in building process)
 sdkconfig
 sdkconfig.old
+sdkconfig.prod
 
 # Discard managed_components (these should be automatically downloaded when building) from commits
 managed_components/

@@ -1,0 +1,15 @@
+# Production build overlay for the Chapter 08 IoT project.
+#
+# Sets the compile-time log level to NONE (ESP_LOG_NONE). Since CONFIG_LOG_MAXIMUM_LEVEL follows
+# CONFIG_LOG_DEFAULT_LEVEL, every ESP_LOGx() call (and its string formatting) is removed from the
+# final binary, so the UART is not kept busy and no CPU cycles are spent on logs in the field.
+# The bootloader logs are disabled as well, shortening every deep sleep wake-up.
+#
+# Production build (uses its own sdkconfig and build directory, so the development
+# configuration in "sdkconfig" / "build" is left untouched):
+#   idf.py -B build_prod -D SDKCONFIG=sdkconfig.prod -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.prod.defaults" build
+#
+# Development build (INFO log level, as usual):
+#   idf.py build
+CONFIG_LOG_DEFAULT_LEVEL_NONE=y
+CONFIG_BOOTLOADER_LOG_LEVEL_NONE=y
