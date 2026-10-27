@@ -34,6 +34,14 @@
 #define LORAWAN_BOOT_BANNER      "Radioenge"
 #define LORAWAN_BOOT_TIMEOUT_MS  3000  //ms
 
+/* Definitions: even after sending its boot banner, the LoRaWAN module ignores any command for
+ * a few seconds (~4 s measured). So, after the banner, LORAWAN_READY_PROBE_CMD (a harmless
+ * query) is sent every LORAWAN_READY_POLL_MS until the module answers it, which means it is
+ * ready to accept commands. If it never answers, the wait gives up after LORAWAN_READY_TIMEOUT_MS */
+#define LORAWAN_READY_PROBE_CMD     "AT+NJM=?\r\n"
+#define LORAWAN_READY_POLL_MS       1000   //ms
+#define LORAWAN_READY_TIMEOUT_MS    10000  //ms
+
 /* Definitions - message confirmation: whether the LoRaWAN module should require a network
  * acknowledgement (confirmed uplink) for sent messages, used as the value of the AT+CFM command */
 #define LORAWAN_SENT_MSG_WITH_CONFIRMATION       '1'

@@ -292,6 +292,39 @@ static void wait_lorawan_module_boot(void)
     ESP_LOGW(TAG_LOGS_LORAWAN, "LoRaWAN module boot banner not received within %d ms", LORAWAN_BOOT_TIMEOUT_MS);
 }
 
+/* Function: wait for the LoRaWAN module to accept commands. The module ignores any command
+ *           sent during the first seconds after its boot banner, so a command sent too early
+ *           (e.g. AT+SENDB) would only be answered after its response timeout and a re-send.
+ *           To avoid that, a harmless query (LORAWAN_READY_PROBE_CMD) is sent periodically until
+ *           the module answers it. The module answers a query with the value only (no "AT_"
+ *           line), so any line received is taken as the answer
+ * Parameters: none
+ * Return: none
+ */
+static void wait_lorawan_module_ready(void)
+{
+    TickType_t start = xTaskGetTickCount();
+    TickType_t timeout = pdMS_TO_TICKS(LORAWAN_READY_TIMEOUT_MS);
+
+    /* Late answers to previous probes are also accepted, so the queue is only reset once */
+    xQueueReset(at_response_queue);
+
+    while ((xTaskGetTickCount() - start) < timeout)
+    {
+        uart_write_bytes(LORAWAN_UART_PORT_NUM, LORAWAN_READY_PROBE_CMD, strlen(LORAWAN_READY_PROBE_CMD));
+        memset(buffer_recepcao, 0x00, sizeof(buffer_recepcao));
+
+        if (xQueueReceive(at_response_queue, buffer_recepcao, pdMS_TO_TICKS(LORAWAN_READY_POLL_MS)) == pdTRUE)
+        {
+            ESP_LOGI(TAG_LOGS_LORAWAN, "LoRaWAN module ready after %lu ms",
+                     (unsigned long)pdTICKS_TO_MS(xTaskGetTickCount() - start));
+            return;
+        }
+    }
+
+    ESP_LOGW(TAG_LOGS_LORAWAN, "LoRaWAN module not ready within %d ms", LORAWAN_READY_TIMEOUT_MS);
+}
+
 /* Function: initialize the UART interface used to communicate with the LoRaWAN module
  * Parameters: none
  * Return: none
@@ -331,8 +364,9 @@ void init_uart_lorawan(void)
                                           NULL, UART_RX_TASK_PRIORITY, NULL);
     configASSERT(task_created == pdPASS);
 
-    /* The module has just been powered up: wait until it is ready to accept commands */
+    /* The module has just been powered up: wait until it boots and is ready to accept commands */
     wait_lorawan_module_boot();
+    wait_lorawan_module_ready();
 }
 
 /* Function: configure the LoRaWAN module by sending it, one by one, all the AT commands
